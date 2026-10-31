@@ -4,6 +4,7 @@ import { Icon } from "./Icon.jsx";
 export default function WhatsAppLink({
   className,
   onUnavailable,
+  onRequestBriefing,
   children,
 }) {
   const configured = /^\d{10,15}$/.test(WHATSAPP_NUMBER);
@@ -18,6 +19,11 @@ export default function WhatsAppLink({
       target={configured ? "_blank" : undefined}
       rel={configured ? "noopener noreferrer" : undefined}
       onClick={(event) => {
+        if (onRequestBriefing) {
+          event.preventDefault();
+          onRequestBriefing();
+          return;
+        }
         if (!configured) {
           event.preventDefault();
           onUnavailable?.();

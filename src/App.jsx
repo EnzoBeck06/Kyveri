@@ -1,66 +1,49 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import About from "./components/About.jsx";
+import BriefingDialog from "./components/BriefingDialog.jsx";
+import Comparison from "./components/Comparison.jsx";
 import Contact from "./components/Contact.jsx";
+import FAQ from "./components/FAQ.jsx";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
 import { IconLibrary } from "./components/Icon.jsx";
 import Projects from "./components/Projects.jsx";
+import Process from "./components/Process.jsx";
 import Services from "./components/Services.jsx";
 import useGsapAnimations from "./hooks/useGsapAnimations.js";
 import useSiteNavigation from "./hooks/useSiteNavigation.js";
 
 export default function App() {
   const rootRef = useRef(null);
-  const [notice, setNotice] = useState("");
+  const [briefingOpen, setBriefingOpen] = useState(false);
 
   useGsapAnimations(rootRef);
   useSiteNavigation(rootRef);
 
-  useEffect(() => {
-    if (!notice) return undefined;
-    const timer = window.setTimeout(() => setNotice(""), 6500);
-    const dismissOnEscape = (event) => {
-      if (event.key === "Escape") setNotice("");
-    };
-    document.addEventListener("keydown", dismissOnEscape);
-    return () => {
-      window.clearTimeout(timer);
-      document.removeEventListener("keydown", dismissOnEscape);
-    };
-  }, [notice]);
-
-  const showWhatsAppNotice = () =>
-    setNotice("Nosso canal de orçamentos estará disponível em breve.");
+  const requestBriefing = () => setBriefingOpen(true);
 
   return (
     <div ref={rootRef}>
       <IconLibrary />
-      <Header onWhatsAppUnavailable={showWhatsAppNotice} />
+      <Header onRequestBriefing={requestBriefing} />
       <main>
-        <Hero onWhatsAppUnavailable={showWhatsAppNotice} />
-        <Services />
+        <div className="hero-services">
+          <div className="hero-atmosphere" aria-hidden="true">
+            <div className="hero-atmosphere-light" />
+          </div>
+          <Hero onRequestBriefing={requestBriefing} />
+          <Services />
+        </div>
+        <Process onRequestBriefing={requestBriefing} />
+        <Comparison />
         <Projects />
         <About />
-        <Contact />
+        <FAQ onRequestBriefing={requestBriefing} />
+        <Contact onRequestBriefing={requestBriefing} />
       </main>
       <Footer />
-      <div
-        className="notice"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        hidden={!notice}
-      >
-        <p>{notice}</p>
-        <button
-          type="button"
-          aria-label="Fechar aviso"
-          onClick={() => setNotice("")}
-        >
-          ×
-        </button>
-      </div>
+      <BriefingDialog open={briefingOpen} onClose={() => setBriefingOpen(false)} />
     </div>
   );
 }
