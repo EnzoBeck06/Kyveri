@@ -1,16 +1,14 @@
 # KYVERI
 
-**Status: Em desenvolvimento.**
+**KYVERI** é uma landing page de apresentação para uma marca dedicada à criação de sites e Landing Pages. O projeto mostra a proposta de trabalho, capacidades do serviço e conceitos demonstrativos para pessoas e negócios que precisam apresentar sua oferta com clareza em uma experiência digital própria.
 
-Landing Page da Kyveri, marca dedicada à criação de Landing Pages modernas, funcionais e personalizadas. Aplicação de página única construída com React, Vite e GSAP. O projeto não tem domínio nem publicação configurados.
+A interface reúne navegação por seções, apresentação visual, serviços, projetos conceituais, informações sobre a marca e um fluxo de briefing para iniciar uma conversa. O site é uma aplicação de página única feita com React e Vite.
 
-![Prévia atual do site Kyveri](src/assets/images/kyveri-site-preview.png)
+## Identidade visual
 
-## Identidade
+A direção visual Carbon combina uma estética escura, editorial, premium e minimalista. A composição usa contraste entre fundos escuros, superfícies grafite e tons claros, com espaçamentos fluidos e adaptações para telas menores.
 
-Direção Carbon, editorial e minimalista, usando Manrope para títulos e marca e Inter para textos funcionais.
-
-| Cor | Valor |
+| Token CSS | Cor |
 | --- | --- |
 | Carbon | `#111110` |
 | Grafite | `#282724` |
@@ -18,86 +16,193 @@ Direção Carbon, editorial e minimalista, usando Manrope para títulos e marca 
 | Marfim | `#F4F1EA` |
 | Texto secundário | `#C7C1B7` |
 
-O sistema de marca inclui o wordmark textual, o símbolo K geométrico, assinaturas SVG para fundos Carbon e Marfim, versões monocromáticas, favicon SVG/PNG e Apple Touch Icon. O desenho do K parte do símbolo que já existia no favicon; a referência visual independente mencionada no briefing não está entre os arquivos deste projeto e precisa ser confirmada pelo proprietário.
+Manrope é usada na identidade e nos títulos; Inter, nos textos funcionais e na interface. O CSS adapta o layout a diferentes larguras e reduz animações quando o sistema informa `prefers-reduced-motion: reduce`. A headline principal é **“Sua ideia merece uma presença digital à altura.”**
 
-## Conteúdo e funcionalidades
+## Tecnologias
 
-- **Início:** apresentação da Kyveri e mockup conceitual em desktop e mobile.
-- **Serviços:** Landing Pages como oferta principal, com cards que descrevem capacidades dessa entrega, sem apresentar identidade visual, sites institucionais ou otimização mobile como ofertas independentes.
-- **Projetos:** quatro conceitos identificados como projetos demonstrativos, sem clientes, resultados ou sites publicados.
-- **Sobre:** apresentação da marca e seus princípios de trabalho.
-- **Contato:** formulário local de briefing; sem backend ou armazenamento. Com o número oficial configurado, abre o WhatsApp com uma mensagem editável. Enquanto `WHATSAPP_NUMBER` estiver vazio, informa que nada foi enviado.
-- Menu responsivo, navegação por âncoras, prévias acessíveis dos projetos e atualização automática do ano do rodapé.
+As versões abaixo vêm do lockfile do projeto. A versão de Node.js e npm é a observada no ambiente de validação indicado neste README; a faixa de Node declarada no `package.json` é `^20.0.0 || >=22.0.0`.
 
-## Tecnologias e recursos
+| Tecnologia | Versão | Uso |
+| --- | --- | --- |
+| React / React DOM | 19.3.1 | Interface e componentes |
+| Vite | 6.4.5 | Servidor local e build |
+| JavaScript / JSX | ES modules | Lógica e componentes da aplicação |
+| CSS | CSS nativo | Layout, identidade visual e responsividade |
+| GSAP | 3.15.0 | Animações de entrada e rolagem |
+| ScrollTrigger | incluído no GSAP 3.15.0 | Disparo de animações associado à rolagem |
+| Playwright Test | 1.64.1 | Testes de navegador automatizados com Chromium |
+| Node.js / npm | 26.13.0 / 11.20.0 | Ambiente da validação documentada |
 
-- React e React DOM para renderizar a interface em componentes; Vite para desenvolvimento e build.
-- GSAP e ScrollTrigger instalados pelo npm. `src/hooks/useGsapAnimations.js` usa `gsap.context()` e `gsap.matchMedia()` para limitar animações ao ciclo de vida do React e respeitar `prefers-reduced-motion`.
-- Manrope e Inter via Google Fonts.
-- WebP para as sete imagens fotográficas carregadas na página, com os PNGs originais como fallback no `<picture>`. O conjunto otimizado ocupa cerca de 1,35 MB, contra 14,46 MB dos PNGs correspondentes, redução aproximada de 90,7%.
-- Favicon SVG e PNG nos tamanhos 16 e 32 px; Apple Touch Icon PNG de 180 px.
-- Arte local Open Graph em `src/assets/images/kyveri-og.png`. Metadados básicos Open Graph e Twitter estão preparados; URLs de imagem, Twitter image e canonical dependem do domínio público.
+Manrope e Inter são carregadas pelo Google Fonts. Os recursos visuais da aplicação ficam em `src/assets/images/`; as imagens WebP são usadas como fonte preferencial e os PNGs correspondentes como fallback nos elementos `<picture>`.
 
-## Estrutura
+## Funcionalidades implementadas
+
+- Cabeçalho responsivo com navegação por âncoras, estado visual de rolagem, indicação da seção atual e menu mobile que fecha ao selecionar uma seção, clicar fora ou pressionar Escape.
+- Hero com a headline principal e mockup ilustrativo responsivo.
+- Seção Serviços com cards expansíveis via `<details>`.
+- Quatro conceitos de projetos demonstrativos, cada um com imagem e diálogo nativo de prévia. Eles **não representam clientes reais nem sites publicados**.
+- Seção Sobre e rodapé com o ano atualizado automaticamente.
+- Formulário local de briefing em diálogo acessível. Não há backend nem armazenamento de dados.
+- Integração preparada para WhatsApp. O número oficial está vazio em `src/config/whatsapp.js`; portanto, nenhuma mensagem é enviada. Com número válido configurado, o formulário abre uma mensagem editável para revisão no WhatsApp.
+- Animações GSAP/ScrollTrigger com limpeza associada ao ciclo de vida React e respeito à preferência por movimento reduzido.
+- Ícones, favicon SVG/PNG e Apple Touch Icon.
+
+## Estrutura do projeto
 
 ```text
 Kyveri/
 ├── index.html
-├── package.json / package-lock.json
+├── package.json
+├── package-lock.json
 ├── playwright.config.js
-├── tests/ (kyveri.spec.js)
 ├── vite.config.js
+├── README.md
+├── .gitignore
+├── tests/
+│   └── kyveri.spec.js
 └── src/
-    ├── main.jsx / App.jsx / assets.js
-    ├── styles/site.css
-    ├── components/ (Header, Hero, Services, Projects, About, Contact, Footer)
-    ├── config/whatsapp.js
-    ├── hooks/ (useGsapAnimations, useSiteNavigation)
+    ├── App.jsx
+    ├── main.jsx
+    ├── assets.js
+    ├── components/
+    │   ├── About.jsx
+    │   ├── Contact.jsx
+    │   ├── Footer.jsx
+    │   ├── Header.jsx
+    │   ├── Hero.jsx
+    │   ├── Icon.jsx
+    │   ├── Projects.jsx
+    │   ├── Services.jsx
+    │   └── WhatsAppLink.jsx
+    ├── config/
+    │   └── whatsapp.js
+    ├── hooks/
+    │   ├── useGsapAnimations.js
+    │   └── useSiteNavigation.js
+    ├── styles/
+    │   └── site.css
     └── assets/
         └── images/
-            ├── identidade, favicons e arte social
-            ├── mockups do Hero, Sobre e Contato em PNG/WebP
-            ├── quatro projetos demonstrativos em PNG/WebP
-            └── capturas de desenvolvimento, notas e assets legados
+            ├── imagens de identidade, favicons e compartilhamento social
+            ├── mockups Kyveri de Hero, Sobre e Contato em PNG/WebP
+            ├── quatro conceitos de projeto em PNG/WebP
+            ├── capturas de prévia e desenvolvimento
+            └── notas Markdown sobre os recursos visuais
 ```
 
-Imagens usadas na página permanecem em `src/assets/images` e são importadas por `src/assets.js`; o Vite emite somente esses assets no build, sem duplicá-los em `public/`. `atelier-devices.png` e as capturas antigas são assets legados mantidos como histórico visual.
+`src/App.jsx` compõe a página e conecta os hooks; `src/main.jsx` monta a aplicação React; `src/assets.js` centraliza imports de imagem. `src/components/` contém as seções e elementos reutilizáveis; `src/hooks/` reúne animações e navegação; `src/config/` guarda a configuração do WhatsApp; `src/styles/site.css` contém a folha de estilos global. `tests/` contém os testes de navegador. `index.html` define a entrada e metadados; `package.json` declara dependências e scripts; `vite.config.js` configura o servidor/build Vite; `playwright.config.js` configura o Chromium e inicia o servidor de teste.
 
-## Execução local
+## Instalação e execução
 
-Na raiz do projeto, instale as dependências e inicie o servidor Vite:
+No PowerShell:
 
-```bash
+```powershell
+cd "C:\Users\Dev\Downloads\Kyveri"
 npm install
 npm run dev
 ```
 
-Acesse o endereço local informado pelo Vite (por padrão, `http://localhost:5173`). Para validar o build de produção, execute `npm run build`; `npm run preview` serve esse build localmente.
+O Vite está configurado para a porta `5173`, com `strictPort`; abra `http://localhost:5173`. Para gerar e servir localmente a versão de produção:
 
-## Configurar o WhatsApp
+```powershell
+npm run build
+npm run preview
+```
 
-Em `src/config/whatsapp.js`, edite `WHATSAPP_NUMBER` com apenas algarismos: código do país, DDD e telefone. O site não define um número padrão. A mensagem do formulário inclui somente os campos preenchidos e abre como rascunho editável no WhatsApp; não é enviada automaticamente. Sem número válido, o briefing permanece na página e nenhum dado é transmitido ou salvo.
+## Testes automatizados
 
-## Acessibilidade e responsividade
+Os scripts disponíveis executam Playwright com Chromium em modo headless, usando Vite em `127.0.0.1:5173`:
 
-Layout responsivo com navegação compacta até 720 px, foco visível, link para pular ao conteúdo, navegação por teclado, `<details>` nativos, diálogos nativos, imagens com texto alternativo e campos com labels. `prefers-reduced-motion` mantém o conteúdo visível e desativa as animações GSAP.
+```powershell
+npm test
+npm run test:headed
+npx playwright test --reporter=html
+npx playwright show-report
+```
 
-## SEO e publicação
+O projeto usa o reporter `list` por padrão; o primeiro comando acima gera o relatório HTML para que `show-report` possa abri-lo.
 
-O HTML inclui idioma `pt-BR`, title, description, viewport, headings semânticos, metadados Open Graph/Twitter básicos e ícones. Não há URL canônica, domínio, contato público, redes sociais ou imagem social com URL absoluta. Esses dados só devem ser completados após decisão do proprietário e publicação.
+O teste automatizado cobre dimensões e screenshots nos viewports `320 × 700`, `390 × 844`, `768 × 1024`, `1024 × 768` e `1440 × 900`, além de overflow horizontal, fontes, imagens, navegação, menu mobile, diálogo de projeto, formulário/CTA, erros de runtime, GSAP/ScrollTrigger e `prefers-reduced-motion`. As capturas são salvas em `test-results/screenshots/`; o diretório é gerado pelos testes e ignorado pelo Git.
 
-## Validação
+**Validação executada em 31/10/2026 neste ambiente:** `npm run build` concluído; `npm test` concluído com **10 testes aprovados** (cinco viewports e cinco testes funcionais). O teste reportou enquadramento parcial da imagem decorativa de Contato em `320 × 700` e `390 × 844`, com razão de visibilidade de 0,45. É um aviso visual conhecido, não uma falha de teste. Esses resultados registram uma execução pontual e não garantem execuções futuras. Não foram executados Lighthouse nem testes em hospedagem pública.
 
-Vite foi iniciado em modo de desenvolvimento e o build de produção foi concluído. Chromium foi executado nas larguras 320, 390, 768, 1024 e 1440 px; a interface React renderizou sem overflow horizontal. Menu mobile, modal de projetos, formulário sem número configurado, navegação interna, imagens do Hero, GSAP e `prefers-reduced-motion` foram verificados. Não há script de lint configurado no projeto.
+## Configuração do WhatsApp
 
-O caminho de abertura do WhatsApp com número válido não foi disparado: o número oficial ainda não está configurado. Não foram executados Lighthouse, validação externa de metadados sociais ou testes em hospedagem pública.
+Edite `WHATSAPP_NUMBER` em `src/config/whatsapp.js` apenas quando o número oficial estiver definido. Use código do país, DDD e telefone em algarismos, sem `+`, espaços ou pontuação. Enquanto estiver vazio, os botões informam que o canal não está configurado e o formulário não transmite nem armazena os dados. Com o número configurado, os dados preenchidos compõem uma mensagem que o visitante pode revisar antes de enviá-la pelo WhatsApp.
 
-## Decisões e próximos passos
+## Git e GitHub
 
-- **Decisão do proprietário necessária:** validar o símbolo K contra a referência visual original; confirmar se deseja acrescentar Processo, Comparador ou FAQ. Essas seções não existem na fonte HTML analisada e não foram inventadas nesta migração.
-- **Decisão do proprietário necessária:** configurar número oficial do WhatsApp e decidir sobre e-mail, domínio e redes sociais públicas.
-- **Depende da publicação:** canonical, URL absoluta para imagem Open Graph/Twitter, metadados finais e teste de compartilhamento em plataformas.
-- **Opcional:** revisar ou arquivar as capturas antigas que permanecem no repositório; avaliar Lighthouse em hospedagem real.
-- **Futuro:** desenvolver projetos demonstrativos em etapa própria. Os conceitos atuais continuam identificados como demonstrações.
+O fluxo usa duas branches no repositório `https://github.com/EnzoBeck06/Kyveri.git`:
 
-Nenhuma licença pública foi definida para o projeto.
+- **`main`**: versão estável; recebe alterações aprovadas por Pull Request.
+- **`develop`**: branch de trabalho para melhorias, correções e refinamentos; build e testes devem passar antes de propor integração.
+
+Comandos de consulta e sincronização:
+
+```powershell
+git status
+git branch -a
+git remote -v
+git switch develop
+git pull --ff-only origin develop
+```
+
+Somente ao iniciar um repositório novo e confirmar que o remoto não tem commits, inicialize e crie a estrutura de branches:
+
+```powershell
+git init
+git branch -M main
+git remote add origin https://github.com/EnzoBeck06/Kyveri.git
+git switch -c develop
+```
+
+Em um clone existente, não rode `git init` nem adicione outro `origin`. Se a branch remota já existir, atualize referências e acompanhe-a em vez de recriá-la:
+
+```powershell
+git fetch origin
+git switch --track origin/develop
+```
+
+Para preparar e enviar alterações em `develop`:
+
+```powershell
+git add README.md .gitignore
+git status
+git commit -m "docs: update project documentation"
+git push -u origin develop
+```
+
+Inclua no `git add` apenas os arquivos revisados que fazem parte da alteração. Para criar uma branch local a partir da versão remota quando ela ainda não existir localmente:
+
+```powershell
+git fetch origin
+git switch --track origin/develop
+```
+
+Se estiver configurando um clone sem remoto, confira a URL antes de adicioná-la:
+
+```powershell
+git remote add origin https://github.com/EnzoBeck06/Kyveri.git
+```
+
+Não reinicialize um repositório existente nem substitua histórico remoto. Se uma branch divergir, inspecione os commits antes de integrar; não use force push. Depois que um PR for revisado e integrado em `main`, atualize `develop` preservando o histórico:
+
+```powershell
+git switch main
+git pull --ff-only origin main
+git switch develop
+git pull --ff-only origin develop
+git merge main
+git push origin develop
+```
+
+Para abrir o PR, envie `develop` e, na página do repositório no GitHub, selecione **Compare & pull request**, usando `main` como base e `develop` como compare. Revise o diff e os checks antes da aprovação e do merge. Não faça merge automático.
+
+## Próximos passos conhecidos
+
+- Refinar visualmente o site sem descaracterizar a direção atual.
+- Rever o enquadramento da imagem decorativa de Contato em telas de `320` e `390` px.
+- Configurar o número oficial do WhatsApp quando definido.
+- Fazer revisão final de acessibilidade, desempenho e SEO, incluindo metadados absolutos após definição de domínio/publicação.
+
+Não há domínio, backend de formulário ou publicação de hospedagem configurados. Não foram definidos clientes, métricas comerciais ou licença pública.
