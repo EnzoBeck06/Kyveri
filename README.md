@@ -2,7 +2,7 @@
 
 **KYVERI** é uma landing page de apresentação para uma marca dedicada à criação de sites e Landing Pages. O projeto mostra a proposta de trabalho, capacidades do serviço e conceitos demonstrativos para pessoas e negócios que precisam apresentar sua oferta com clareza em uma experiência digital própria.
 
-A interface reúne navegação por seções, apresentação visual, serviços, projetos conceituais, informações sobre a marca e um fluxo de briefing para iniciar uma conversa. O site é uma aplicação de página única feita com React e Vite.
+A interface reúne navegação por seções, apresentação visual, serviços, processo de criação, comparação ilustrativa de design, projetos conceituais, informações sobre a marca, perguntas frequentes e um fluxo de briefing para iniciar uma conversa. O site é uma aplicação de página única feita com React e Vite.
 
 ## Identidade visual
 
@@ -38,13 +38,16 @@ Manrope e Inter são carregadas pelo Google Fonts. Os recursos visuais da aplica
 ## Funcionalidades implementadas
 
 - Cabeçalho responsivo com navegação por âncoras, estado visual de rolagem, indicação da seção atual e menu mobile que fecha ao selecionar uma seção, clicar fora ou pressionar Escape.
-- Hero com a headline principal e mockup ilustrativo responsivo.
+- Hero editorial com a headline principal, CTA de orçamento em destaque e mockup ilustrativo em coluna própria. A transição para Serviços usa um gradiente discreto, com movimento de até 18 px no desktop e 8 px no celular.
 - Seção Serviços com cards expansíveis via `<details>`.
+- Processo em seis etapas, com timeline em três colunas no desktop, duas em tablet e vertical no celular. Não há prazos ou condições comerciais fixos.
+- Comparador conceitual em HTML/CSS, usando o mesmo asset existente nos dois lados, com arraste por mouse/toque e controle nativo por teclado. Não representa um resultado real de cliente.
 - Quatro conceitos de projetos demonstrativos, cada um com imagem e diálogo nativo de prévia. Eles **não representam clientes reais nem sites publicados**.
 - Seção Sobre e rodapé com o ano atualizado automaticamente.
-- Formulário local de briefing em diálogo acessível. Não há backend nem armazenamento de dados.
+- FAQ com seis perguntas, botões reais, `aria-expanded`, painéis associados e suporte a teclado.
+- Briefing compartilhado pelos CTAs de orçamento, com nome, tipo de projeto, objetivo, descrição e contexto opcional. Há uma etapa de revisão da mensagem e opção de voltar para editar. Não há backend nem armazenamento permanente: as informações ficam na memória da página.
 - Integração preparada para WhatsApp. O número oficial está vazio em `src/config/whatsapp.js`; portanto, nenhuma mensagem é enviada. Com número válido configurado, o formulário abre uma mensagem editável para revisão no WhatsApp.
-- Animações GSAP/ScrollTrigger com limpeza associada ao ciclo de vida React e respeito à preferência por movimento reduzido.
+- Animações GSAP/ScrollTrigger de entrada e revelação por elemento, com limpeza associada ao ciclo de vida React, atualização em mudanças de layout e respeito à preferência por movimento reduzido.
 - Ícones, favicon SVG/PNG e Apple Touch Icon.
 
 ## Estrutura do projeto
@@ -59,28 +62,37 @@ Kyveri/
 ├── README.md
 ├── .gitignore
 ├── tests/
-│   └── kyveri.spec.js
+│   ├── kyveri.spec.js
+│   └── experience.spec.js
 └── src/
     ├── App.jsx
     ├── main.jsx
     ├── assets.js
     ├── components/
     │   ├── About.jsx
+    │   ├── BriefingDialog.jsx
+    │   ├── Comparison.jsx
     │   ├── Contact.jsx
+    │   ├── FAQ.jsx
     │   ├── Footer.jsx
     │   ├── Header.jsx
     │   ├── Hero.jsx
     │   ├── Icon.jsx
     │   ├── Projects.jsx
+    │   ├── Process.jsx
     │   ├── Services.jsx
     │   └── WhatsAppLink.jsx
     ├── config/
+    │   ├── navigation.js
     │   └── whatsapp.js
     ├── hooks/
     │   ├── useGsapAnimations.js
     │   └── useSiteNavigation.js
     ├── styles/
+    │   ├── experience.css
     │   └── site.css
+    ├── utils/
+    │   └── briefing.js
     └── assets/
         └── images/
             ├── imagens de identidade, favicons e compartilhamento social
@@ -90,7 +102,7 @@ Kyveri/
             └── notas Markdown sobre os recursos visuais
 ```
 
-`src/App.jsx` compõe a página e conecta os hooks; `src/main.jsx` monta a aplicação React; `src/assets.js` centraliza imports de imagem. `src/components/` contém as seções e elementos reutilizáveis; `src/hooks/` reúne animações e navegação; `src/config/` guarda a configuração do WhatsApp; `src/styles/site.css` contém a folha de estilos global. `tests/` contém os testes de navegador. `index.html` define a entrada e metadados; `package.json` declara dependências e scripts; `vite.config.js` configura o servidor/build Vite; `playwright.config.js` configura o Chromium e inicia o servidor de teste.
+`src/App.jsx` compõe a página, conecta os hooks e controla a abertura do briefing único; `src/main.jsx` monta a aplicação React; `src/assets.js` centraliza imports de imagem. `src/components/` contém as seções e elementos reutilizáveis; `src/hooks/` reúne animações e navegação; `src/config/` guarda a navegação compartilhada e a configuração do WhatsApp. `src/styles/site.css` contém o sistema visual Carbon e importa `experience.css`, que organiza Processo, Comparador, FAQ e a revisão do briefing. `src/utils/briefing.js` monta a mensagem sem efeitos externos. `tests/` contém os testes de navegador. `index.html` define a entrada e metadados; `package.json` declara dependências e scripts; `vite.config.js` configura o servidor/build Vite; `playwright.config.js` configura o Chromium e inicia o servidor de teste.
 
 ## Instalação e execução
 
@@ -120,15 +132,25 @@ npx playwright test --reporter=html
 npx playwright show-report
 ```
 
-O projeto usa o reporter `list` por padrão; o primeiro comando acima gera o relatório HTML para que `show-report` possa abri-lo.
+O projeto usa o reporter `list` por padrão; o comando com `--reporter=html` gera o relatório HTML para que `show-report` possa abri-lo.
 
 O teste automatizado cobre dimensões e screenshots nos viewports `320 × 700`, `390 × 844`, `768 × 1024`, `1024 × 768` e `1440 × 900`, além de overflow horizontal, fontes, imagens, navegação, menu mobile, diálogo de projeto, formulário/CTA, erros de runtime, GSAP/ScrollTrigger e `prefers-reduced-motion`. As capturas são salvas em `test-results/screenshots/`; o diretório é gerado pelos testes e ignorado pelo Git.
 
-**Validação executada em 31/10/2026 neste ambiente:** `npm run build` concluído; `npm test` concluído com **10 testes aprovados** (cinco viewports e cinco testes funcionais). O teste reportou enquadramento parcial da imagem decorativa de Contato em `320 × 700` e `390 × 844`, com razão de visibilidade de 0,45. É um aviso visual conhecido, não uma falha de teste. Esses resultados registram uma execução pontual e não garantem execuções futuras. Não foram executados Lighthouse nem testes em hospedagem pública.
+**Validação da experiência completa em 31/10/2026 neste ambiente:** `npm run build` concluído; `npm test -- --reporter=list,json` concluído com **25 testes aprovados**, zero falhas e zero testes ignorados. A suíte cobre as cinco resoluções, comparador por mouse e teclado, toque emulado em 320/390 px, FAQ, timeline, revisão/edição do briefing e ausência de envio com WhatsApp vazio. Também verifica foco em janela de 390 × 450, zoom de página emulado em 2× via CDP, limpeza de ScrollTriggers em StrictMode e zero gatilhos com movimento reduzido. A imagem de Contato permanece contida, com razão mínima exigida de 0,98. As capturas das cinco resoluções foram inspecionadas visualmente.
+
+A comparação local desta etapa fica em `test-results/complete-2026-10-31/comparison.html`, com capturas em `before/` e `after/`. O resultado JSON final está em `checks-02/results.json`. As capturas e relatórios anteriores foram preservados. Esses artefatos são ignorados pelo Git. Os resultados registram uma execução pontual e não garantem execuções futuras. Não foram executados Lighthouse, testes em aparelhos físicos/Safari/leitor de tela ou em hospedagem pública.
+
+Para isolar uma execução e preservar resultados anteriores, defina uma pasta nova antes dos testes (a configuração padrão continua sendo `test-results/`):
+
+```powershell
+$env:KYVERI_TEST_RESULTS_DIR = "test-results/minha-nova-validacao"
+$env:PLAYWRIGHT_JSON_OUTPUT_FILE = "$env:KYVERI_TEST_RESULTS_DIR/results.json"
+npm test -- --reporter=list,json
+```
 
 ## Configuração do WhatsApp
 
-Edite `WHATSAPP_NUMBER` em `src/config/whatsapp.js` apenas quando o número oficial estiver definido. Use código do país, DDD e telefone em algarismos, sem `+`, espaços ou pontuação. Enquanto estiver vazio, os botões informam que o canal não está configurado e o formulário não transmite nem armazena os dados. Com o número configurado, os dados preenchidos compõem uma mensagem que o visitante pode revisar antes de enviá-la pelo WhatsApp.
+Edite `WHATSAPP_NUMBER` em `src/config/whatsapp.js` apenas quando o número oficial estiver definido. Use código do país, DDD e telefone em algarismos, sem `+`, espaços ou pontuação. Os CTAs abrem o briefing e sua revisão local. Enquanto o número estiver vazio, a interface informa a indisponibilidade e não transmite dados. Com o número configurado, “Abrir no WhatsApp” abre a mensagem preparada para revisão e envio pelo próprio visitante no aplicativo.
 
 ## Git e GitHub
 
@@ -200,8 +222,7 @@ Para abrir o PR, envie `develop` e, na página do repositório no GitHub, seleci
 
 ## Próximos passos conhecidos
 
-- Refinar visualmente o site sem descaracterizar a direção atual.
-- Rever o enquadramento da imagem decorativa de Contato em telas de `320` e `390` px.
+- Validar a composição e a navegação em aparelhos físicos e Safari, além do Chromium já avaliado.
 - Configurar o número oficial do WhatsApp quando definido.
 - Fazer revisão final de acessibilidade, desempenho e SEO, incluindo metadados absolutos após definição de domínio/publicação.
 

@@ -70,11 +70,12 @@ export default function Projects() {
           </a>
         </div>
         <div id="project-grid" className="project-grid">
-          {projects.map((project) => {
+          {projects.map((project, index) => {
             const artwork = projectAssets[project.key];
             return (
               <article className="project-card" data-reveal key={project.key}>
                 <div className="project-art">
+                  <span className="project-number" aria-hidden="true">0{index + 1}</span>
                   <picture>
                     <source srcSet={artwork.webp} type="image/webp" />
                     <img
@@ -99,6 +100,7 @@ export default function Projects() {
                     aria-label={`Ampliar demonstração: ${project.title}`}
                     onClick={() => openProject(project)}
                   >
+                    <span>Ver conceito</span>
                     <Icon name="diagonal" />
                   </button>
                 </div>
@@ -117,7 +119,12 @@ export default function Projects() {
         ref={dialogRef}
         onClose={() => setSelectedProject(null)}
         onClick={(event) => {
-          if (event.target === dialogRef.current) closeProject();
+          if (event.target !== dialogRef.current) return;
+          const bounds = dialogRef.current.getBoundingClientRect();
+          if (
+            event.clientX < bounds.left || event.clientX > bounds.right ||
+            event.clientY < bounds.top || event.clientY > bounds.bottom
+          ) closeProject();
         }}
       >
         <button

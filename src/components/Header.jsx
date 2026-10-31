@@ -2,16 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { assets } from "../assets.js";
 import { Icon } from "./Icon.jsx";
 import WhatsAppLink from "./WhatsAppLink.jsx";
+import { navigationLinks } from "../config/navigation.js";
 
-const links = [
-  ["Início", "#inicio"],
-  ["Projetos", "#projetos"],
-  ["Serviços", "#servicos"],
-  ["Sobre", "#sobre"],
-  ["Contato", "#contato"],
-];
-
-export default function Header({ onWhatsAppUnavailable }) {
+export default function Header({ onRequestBriefing }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef(null);
   const toggleRef = useRef(null);
@@ -86,7 +79,7 @@ export default function Header({ onWhatsAppUnavailable }) {
           aria-label="Navegação principal"
           onClick={handleNavigationClick}
         >
-          {links.map(([label, href]) => (
+          {navigationLinks.map(([label, href]) => (
             <a href={href} key={href}>
               {label}
             </a>
@@ -94,7 +87,7 @@ export default function Header({ onWhatsAppUnavailable }) {
         </nav>
         <WhatsAppLink
           className="button button-primary header-cta"
-          onUnavailable={onWhatsAppUnavailable}
+          onRequestBriefing={onRequestBriefing}
         >
           <Icon name="whatsapp" />
           Solicitar orçamento

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const screenshotsDir = path.resolve(here, "../test-results/screenshots");
+const screenshotsDir = path.resolve(here, "..", process.env.KYVERI_TEST_RESULTS_DIR || "test-results", "screenshots");
 const viewports = [
   { width: 320, height: 700 },
   { width: 390, height: 844 },
@@ -67,7 +67,7 @@ test.describe("KYVERI 3.0 — responsividade e screenshots", () => {
       await expect(page.locator("#hero-title")).toBeVisible();
       await expect(page.locator("#hero-title")).toContainText(/Sua ideia merece uma presença digital.*à altura\./s);
 
-      for (const id of ["inicio", "servicos", "projetos", "sobre", "contato"]) {
+      for (const id of ["inicio", "servicos", "processo", "comparacao", "projetos", "sobre", "perguntas", "contato"]) {
         await expect(page.locator(`#${id}`), `seção #${id}`).toBeVisible();
       }
 
@@ -138,9 +138,7 @@ test.describe("KYVERI 3.0 — responsividade e screenshots", () => {
       expect(layout.images.filter((image) => !image.loaded), "imagens não carregadas").toEqual([]);
       expect(layout.fonts, "fontes de identidade carregadas").toEqual({ inter: true, manrope: true });
       expect(layout.textOverlaps, "headline, descrição e CTAs não devem se sobrepor").toEqual([]);
-      if (layout.contactImageVisibleRatio < 0.55) {
-        console.warn(`[visual audit ${width}x${height}] imagem de contato cortada pelo contêiner: ${layout.contactImageVisibleRatio} visível`);
-      }
+      expect(layout.contactImageVisibleRatio, "imagem de Contato contida na seção").toBeGreaterThanOrEqual(0.98);
       expect(runtime.failedRequests, "recursos locais com falha").toEqual([]);
       expect(runtime.errors, "erros JavaScript/console").toEqual([]);
     });
@@ -148,6 +146,50 @@ test.describe("KYVERI 3.0 — responsividade e screenshots", () => {
 });
 
 test.describe("KYVERI 3.0 — interações e animações", () => {
+  test("briefing valida espaços e mantém navegação por teclado", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const open = page.locator(".contact-copy").getByRole("button", { name: /Solicitar orçamento/ });
+    await open.click();
+    const dialog = page.locator(".briefing-dialog");
+    await expect(dialog.getByLabel("Seu nome")).toBeFocused();
+    await dialog.getByLabel("Seu nome").fill("   ");
+    await dialog.getByLabel("Tipo de projeto").selectOption("Landing Page");
+    await dialog.getByLabel("Objetivo principal").fill("   ");
+    await dialog.getByLabel("Descrição do projeto").fill("   ");
+    await dialog.getByRole("button", { name: /Revisar mensagem/ }).click();
+    await expect(dialog.getByLabel("Seu nome")).toBeFocused();
+    expect(await dialog.getByLabel("Seu nome").evaluate((field) => field.validity.customError)).toBe(true);
+    await dialog.getByLabel("Seu nome").fill("Pessoa de teste");
+    await dialog.getByLabel("Objetivo principal").fill("Apresentar uma proposta.");
+    await dialog.getByLabel("Descrição do projeto").fill("Uma Landing Page.");
+    await dialog.getByRole("button", { name: /Revisar mensagem/ }).click();
+    await dialog.getByRole("button", { name: /Abrir no WhatsApp/ }).click();
+    await expect(dialog.getByRole("status")).toContainText("não foi enviado");
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+    await expect(open).toBeFocused();
+  });
+
+  test("diálogo de projeto conserva a prévia ao clicar em sua área interna", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const open = page.locator(".project-open").first();
+    await open.click();
+    const dialog = page.locator(".project-dialog");
+    // A native dialog is the click target in its own padding / scrollbar gutter.
+    await dialog.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      element.dispatchEvent(new MouseEvent("click", {
+        bubbles: true, clientX: rect.left + 2, clientY: rect.bottom - 2,
+      }));
+    });
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+    await expect(open).toBeFocused();
+  });
+
   test("navegação e menu mobile abrem, navegam e fecham", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     const runtime = collectRuntimeProblems(page);
@@ -171,6 +213,7 @@ test.describe("KYVERI 3.0 — interações e animações", () => {
     await page.locator('#main-nav a[href="#projetos"]').click();
     await expect(page).toHaveURL(/#projetos$/);
     await expect(page.locator("#projetos")).toBeInViewport();
+    await expect(page.locator('#main-nav a[href="#projetos"]')).toHaveAttribute("aria-current", "location");
     await expect(runtime.errors, "erros JavaScript/console").toEqual([]);
   });
 
@@ -194,17 +237,21 @@ test.describe("KYVERI 3.0 — interações e animações", () => {
     const briefing = page.locator("dialog.briefing-dialog");
     await expect(briefing).toBeVisible();
     await briefing.getByLabel("Seu nome").fill("Teste Playwright");
-    await briefing.getByLabel("O que você gostaria de apresentar?").fill("Uma página demonstrativa.");
-    await briefing.getByRole("button", { name: /Continuar no WhatsApp/ }).click();
+    await briefing.getByLabel("Tipo de projeto").selectOption("Landing Page");
+    await briefing.getByLabel("Objetivo principal").fill("Apresentar um serviço.");
+    await briefing.getByLabel("Descrição do projeto").fill("Uma página demonstrativa.");
+    await briefing.getByRole("button", { name: /Revisar mensagem/ }).click();
+    await briefing.getByRole("button", { name: /Abrir no WhatsApp/ }).click();
     await expect(briefing.getByRole("status")).toContainText(/WhatsApp oficial ainda não foi configurado/i);
     await expect(runtime.errors, "erros JavaScript/console").toEqual([]);
   });
 
-  test("CTA do WhatsApp informa que o número está pendente sem navegar para fora", async ({ page }) => {
+  test("CTA do hero abre o briefing e informa a indisponibilidade do WhatsApp", async ({ page }) => {
     const runtime = collectRuntimeProblems(page);
     await page.goto("/");
-    await page.locator(".hero-actions .button-secondary").click();
-    await expect(page.getByRole("status")).toContainText(/canal de orçamentos estará disponível em breve/i);
+    await page.locator(".hero-actions").getByRole("link", { name: /Solicitar orçamento/ }).click();
+    await expect(page.locator(".briefing-dialog")).toBeVisible();
+    await expect(page.locator(".briefing-channel")).toContainText(/nenhuma informação será enviada/i);
     await expect(page).toHaveURL(/\/$/);
     await expect(runtime.errors, "erros JavaScript/console").toEqual([]);
   });

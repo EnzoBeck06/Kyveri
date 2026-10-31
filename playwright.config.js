@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: "list",
   timeout: 60_000,
   expect: { timeout: 8_000 },
-  outputDir: "./test-results/artifacts",
+  outputDir: `${process.env.KYVERI_TEST_RESULTS_DIR || "./test-results"}/artifacts`,
   use: {
     ...devices["Desktop Chrome"],
     browserName: "chromium",
